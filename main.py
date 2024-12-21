@@ -2,13 +2,19 @@ import cv2
 import os
 from pyzbar.pyzbar import decode
 
+comp_code_data = decode(cv2.imread('assets/good.png'))
+
 cap = cv2.VideoCapture('assets\образец №2.mp4')
+
 output_video_path = 'output_video.mp4'
 #====================обработка
 
 fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) 
+
+new_width = 640
+new_height = 480
 
 
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -49,16 +55,23 @@ while video_cap.isOpened():
         break
     
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    resized_frame = cv2.resize(gray_frame, (new_width, new_height))
     
     barcodes = decode(gray_frame)
     
     for barcode in barcodes:
         qr_code_data = barcode.data.decode('utf-8')
+        if qr_code_data == comp_code_data[0].data.decode('utf-8'):
         
-        x, y, w, h = barcode.rect
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            x, y, w, h = barcode.rect
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
-        cv2.putText(frame, qr_code_data, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            cv2.putText(frame, 'CORRECT QR', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        else:
+            x, y, w, h = barcode.rect
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        
+            cv2.putText(frame, qr_code_data, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     
     cv2.imshow('QR Detection', frame)
     
