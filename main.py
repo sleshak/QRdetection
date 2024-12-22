@@ -105,7 +105,6 @@ class MainWindow(QWidget):
 
         cap = cv2.VideoCapture(self.input_video_path)
 
-        #====================обработка
         fps = cap.get(cv2.CAP_PROP_FPS)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) 
@@ -113,12 +112,14 @@ class MainWindow(QWidget):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height), isColor=False)
 
-        last_qr_position = None  # Переменная для хранения последней позиции QR-кода
+        last_qr_position = None
 
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
                 break
+
+            frame = cv2.resize(frame, (width, height))
 
             gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -138,7 +139,6 @@ class MainWindow(QWidget):
         out.release()
         cv2.destroyAllWindows()
 
-        #========================================вывод
         video_cap = cv2.VideoCapture(output_video_path)
 
         while video_cap.isOpened():
@@ -147,6 +147,8 @@ class MainWindow(QWidget):
             if not ret:
                 break
             
+            frame = cv2.resize(frame, (width, height))
+
             gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             
             barcodes = decode(gray_frame)
@@ -157,7 +159,7 @@ class MainWindow(QWidget):
                 qr_code_data = barcode.data.decode('utf-8')
                 if qr_code_data == comp_code_data[0].data.decode('utf-8'):
                     found_correct_qr = True
-                    last_qr_position = barcode.rect  # Обновляем последнюю позицию QR-кода
+                    last_qr_position = barcode.rect
 
                     x, y, w, h = last_qr_position
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
