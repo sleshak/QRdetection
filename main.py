@@ -160,7 +160,7 @@ class MainWindow(QWidget):
                 if qr_code_data == comp_code_data[0].data.decode('utf-8'):
                     found_correct_qr = True
                     last_qr_position = barcode.rect
-
+                    print(f"Координаты правильного QR: {last_qr_position}")
                     x, y, w, h = last_qr_position
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                     cv2.putText(frame, 'CORRECT QR', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
@@ -184,6 +184,8 @@ class MainWindow(QWidget):
 
         if os.path.exists(output_video_path):
             os.remove(output_video_path)
+        
+        self.file_label.setText("Выберите QR и видео")
 
 
     def select_qr(self):
