@@ -33,15 +33,11 @@ __Наша команда состоит из 5 человек__:
 <table>
   <tr>
     <td>F1</td>
-    <td></td>
+    <td>0,8</td>
   </tr>
   <tr>
     <td>Recall</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Precision</td>
-    <td></td>
+    <td>0,666</td>
   </tr>
 </table>
 
