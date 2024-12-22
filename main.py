@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import filedialog
 from pyzbar.pyzbar import decode
 
+
+
 def select_video_file():
     root = tk.Tk()
     root.withdraw()
@@ -41,7 +43,7 @@ height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter(output_video_path, fourcc, fps, (new_width, new_height), isColor=False)
+out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height), isColor=False)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -57,7 +59,7 @@ while cap.isOpened():
                                                cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
                                                cv2.THRESH_BINARY, 11, 2)
     
-    resized_frame = cv2.resize(thresholded_frame, (new_width, new_height))
+    resized_frame = cv2.resize(thresholded_frame, (width, height))
 
     out.write(resized_frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
