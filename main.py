@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import filedialog
 from pyzbar.pyzbar import decode
 
+#коорды первый раз поймал оставить рамку последнего нахождения 
 
 
 def select_video_file():
@@ -83,20 +84,30 @@ while video_cap.isOpened():
     
     barcodes = decode(gray_frame)
     
+    found_correct_qr = False
+    last_qr_position = None
+
     for barcode in barcodes:
         qr_code_data = barcode.data.decode('utf-8')
         if qr_code_data == comp_code_data[0].data.decode('utf-8'):
-        
-            x, y, w, h = barcode.rect
+            found_correct_qr = True
+            last_qr_position = barcode.rect
+
+            x, y, w, h = last_qr_position
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        
             cv2.putText(frame, 'CORRECT QR', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            found_correct_qr = False
         else:
             x, y, w, h = barcode.rect
+
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        
             cv2.putText(frame, qr_code_data, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    
+
+    if not found_correct_qr and last_qr_position:
+        x, y, w, h = last_qr_position
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.putText(frame, 'LAST CORRECT QR', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
     cv2.imshow('QR Detection', frame)
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
