@@ -1,10 +1,36 @@
 import cv2
 import os
+import tkinter as tk
+from tkinter import filedialog
 from pyzbar.pyzbar import decode
 
-comp_code_data = decode(cv2.imread('assets/good.png'))
+def select_video_file():
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(title="Выберите видеофайл", 
+                                            filetypes=[("Video Files", "*.mp4;*.avi;*.mov;*.mkv")])
+    return file_path
 
-cap = cv2.VideoCapture('assets\образец №2.mp4')
+input_video_path = select_video_file()
+if not input_video_path:
+    print("Входное видео не выбрано. Завершение программы.")
+    exit()
+
+cap = cv2.VideoCapture(input_video_path)
+
+def select_qr():
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(title="Выберите нужный QR", 
+                                            filetypes=[("Photo Files", "*.jpg;*.jpeg;*.png")])
+    return file_path
+
+QR_path = select_qr()
+if not QR_path:
+    print("Вы не выбрали QR. Завершение программы.")
+    exit()
+
+comp_code_data = decode(cv2.imread(QR_path))
 
 output_video_path = 'output_video.mp4'
 #====================обработка
@@ -13,12 +39,9 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) 
 
-new_width = 640
-new_height = 480
-
 
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height), isColor=False)
+out = cv2.VideoWriter(output_video_path, fourcc, fps, (new_width, new_height), isColor=False)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -34,7 +57,7 @@ while cap.isOpened():
                                                cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
                                                cv2.THRESH_BINARY, 11, 2)
     
-    resized_frame = cv2.resize(thresholded_frame, (width, height))
+    resized_frame = cv2.resize(thresholded_frame, (new_width, new_height))
 
     out.write(resized_frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -55,7 +78,6 @@ while video_cap.isOpened():
         break
     
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    resized_frame = cv2.resize(gray_frame, (new_width, new_height))
     
     barcodes = decode(gray_frame)
     
